@@ -1,0 +1,29 @@
+{% extends "main/base.html" %}
+{% block content %}
+<div class="content-section">
+    <div style="border-bottom: 1px solid #e3e3e3">
+        <h2>{{ part.Brand }}  {{ part.Name }}</h2>
+    </div>
+    <br>
+    <div style="width:100%; display:inline-block">
+        <img style="max-width:30%;float:left; max-height:100%;" src="{{ part.Image.url }}",>
+        <div >
+            <h3>Part Description:</h3>
+            <p>{{ part.Description }}</p>
+            <h3>Recommendations for buying this part:</h3>
+            <p>{{ part.Recommendations}}</p>
+        </div>
+    </div>
+    <div>
+        <h3>Specifications:</h3>
+        <table>
+            {% for field, value in part_serialized.fields.items %}
+                <tr>
+                    <th>{{ field }}</th>
+                    <th style="width:70%">{{ value }}</th>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+{% endblock content %}

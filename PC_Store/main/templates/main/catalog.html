@@ -34,7 +34,7 @@
     <div class="row">
         {% for part in parts %}
         <a href="?itemID={{ part.id }}" class="catalogLink">
-            <div class="column" style = "position:relative;top:20px;width:100%;border-style:groove;border-color:lightgrey;height:400px">
+            <div class="column" style = "position:relative;top:20px;width:100%;border-style:groove;border-color:lightgrey;height:400px;overflow:hidden;">
                 <h2>{{ part.Brand }}</h2>
                 <h2>{{ part.Name }}</h2>
                 <img style="max-width:100%;max-height:67.5%;display: block;margin-left: auto;margin-right: auto;"src="{{ part.Image.url }}">

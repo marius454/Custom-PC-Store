@@ -13,6 +13,8 @@
         </div>
         <div>
             <button class="btn btn-outline-info" type="submit" id="edit" onclick="Openform()">Edit</button>
+            <button class="btn btn-outline-info" type="submit" onclick="Pass()">Reset Password</button>
+            <button class="btn btn-outline-info" type="submit" onclick="Email()">Update Email</button>
         </div>
         <form method="POST" id="update" style="display:none">
             {% csrf_token %}
@@ -28,12 +30,20 @@
     </div>
     <script>
         function Openform()
-            {
-                if (document.getElementById('update').style.display == 'none'){
-                    document.getElementById('update').style.display = '';
-                } else{
-                    document.getElementById('update').style.display = 'none';
-                }
+        {
+            if (document.getElementById('update').style.display == 'none'){
+                document.getElementById('update').style.display = '';
+            } else{
+                document.getElementById('update').style.display = 'none';
             }
+        }
+        function Pass()
+        {
+            window.location.href = {% url 'password_reset' %}
+        }
+        function Email()
+        {
+            window.location.href = {% url 'email_update' %}
+        }
     </script>
 {% endblock content %}

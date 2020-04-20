@@ -4,6 +4,7 @@ from .forms import UserRegisterForm
 from .forms import UserProfileForm
 from .forms import UserUpdateForm
 from .forms import ProfileUpdateForm
+from .forms import EmailUpdateForm
 from django.contrib.auth.decorators import login_required
 
 def register(request):
@@ -44,3 +45,20 @@ def profile(request):
         'pu_form': pu_form
     }
     return render(request,'users/profile.html', context)
+
+@login_required
+def emailUpdate(request):
+    if request.method == 'POST':
+        form = EmailUpdateForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+
+            messages.success(request, f'Your email has been changed')
+            return redirect('profile')
+    else:
+        form = EmailUpdateForm(instance=request.user)
+    context = {
+        'form': form
+    }
+    return render(request,'users/email_update.html', context)
+

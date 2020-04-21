@@ -1,0 +1,31 @@
+{% extends "main/base.html" %}
+{% load main_tags %}
+{% block content %}
+<div class="content-section">
+    <h2>Configure your PC build</h2>
+    <p>Here you can pick the part you wish to be in your computer to get the optimal machine for you</p>
+    <p>Current Price of build: {{ total }}</p>
+    <div style="margin-bottom: 20px;">
+        <p class="part-type">CPU:</p>
+        <div class="row">
+            {% for part in all_parts.CPU %}
+                <div class="column part-selector">
+                    <label for="{{ part | get_class_name }}_{{ part.id }}">
+                        <input id = "{{ part | get_class_name }}_{{ part.id }}" name="{{ part | get_class_name }}" type="radio">
+                        <i></i>
+                        <span style = "float: right; font-size: 14px">+{{ part.Price }} €</span>
+                    </label>
+                    <div >
+                        <p>{{ part.Brand }}</p>
+                        <p>{{ part.Name }}</p>
+                        <img src="{{ part.Image.url }}">
+                    </div>
+                </div>
+            {% if forloop.counter|divisibleby:"8" and not forloop.last %}
+            </div><div class="row">
+            {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

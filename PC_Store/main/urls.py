@@ -8,4 +8,5 @@ urlpatterns = [
     path(r'catalog/', views.catalog, name='store-catalog'),
     path(r'catalog/<itemType>/', views.catalog, name='store-catalog'),
     path(r'catalog/<itemType>/?itemID=<itemID>', views.catalog, name='store-catalog'),
+    path('configure/', views.configure, name='configure'),
 ]

@@ -6,6 +6,10 @@ from django.core.paginator import Paginator
 from django.apps import apps
 from django.core.serializers import serialize
 from . import models
+from django.contrib.auth.decorators import login_required
+
+
+part_types = ['CPU','GPU','Motherboard','Ram_set', 'PSU', 'Storage', 'Case', 'CPU_Cooler']
 
 def home(request):
     posts = models.Post.objects.all().order_by('-date_posted')
@@ -69,3 +73,17 @@ def product(request, itemID, itemType='cpu'):
     }
     return render(request, 'main/product.html', context)
 
+@login_required
+def configure(request):
+    main_models = apps.get_models('main')
+    all_parts = {}
+    for model in main_models:
+        if model.__name__ in part_types:
+            all_parts.update({model.__name__: model.objects.all()})
+
+
+    context = {
+        'all_parts': all_parts,
+        'total': 0,
+    }
+    return render(request, 'main/configure.html', context)

@@ -151,6 +151,7 @@ class CPU_Cooler(models.Model):
         return f'{self.Brand} {self.Name}'
 
 class Configuration(models.Model):
+    UserID = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     CPU = models.ForeignKey(CPU, on_delete=models.SET_NULL, null=True)
     GPU = models.ForeignKey(GPU, on_delete=models.SET_NULL, null=True)
     Motherboard = models.ForeignKey(Motherboard, on_delete=models.SET_NULL, null=True)
@@ -159,6 +160,10 @@ class Configuration(models.Model):
     Storage = models.ForeignKey(Storage, on_delete=models.SET_NULL, null=True)
     Case = models.ForeignKey(Case, on_delete=models.SET_NULL, null=True)
     CPU_Cooler = models.ForeignKey(CPU_Cooler, on_delete=models.SET_NULL, null=True)
+    Date_Saved = models.DateTimeField(default=timezone.now)
+    
+    def __str__(self):
+        return f'Saved build of user {self.UserID} - {self.Date_Saved}'
 
 class Saved_build(models.Model):
     Belongs_to_user = models.ForeignKey(User, on_delete=models.CASCADE)

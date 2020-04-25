@@ -1,0 +1,10 @@
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section">
+    <div class="alert alert-info">
+        Your configuration has been saved succsesfully.
+    </div>
+    <a href="{% url 'profile' %}"> View build in profile </a>
+</div>
+{% endblock content %}

@@ -6,26 +6,38 @@
     <p>Here you can pick the part you wish to be in your computer to get the optimal machine for you</p>
     <p>Current Price of build: {{ total }}</p>
     <div style="margin-bottom: 20px;">
-        <p class="part-type">CPU:</p>
-        <div class="row">
-            {% for part in all_parts.CPU %}
-                <div class="column part-selector">
-                    <label for="{{ part | get_class_name }}_{{ part.id }}">
-                        <input id = "{{ part | get_class_name }}_{{ part.id }}" name="{{ part | get_class_name }}" type="radio">
-                        <i></i>
-                        <span style = "float: right; font-size: 14px">+{{ part.Price }} €</span>
-                    </label>
-                    <div >
-                        <p>{{ part.Brand }}</p>
-                        <p>{{ part.Name }}</p>
-                        <img src="{{ part.Image.url }}">
+        <form action="{% url 'configure-complete' %}" method="POST">
+            {% csrf_token %}
+            {% for key, parts in all_parts.items %}
+                <p class="part-type">{{ key }}:</p>
+                <div class="row" style="margin-bottom: 10px">
+                {% for part in parts %}
+                
+                    <div class="column part-selector">
+                        <label for="{{ part | get_class_name }}_{{ part.id }}">
+                            <input id = "{{ part | get_class_name }}_{{ part.id }}" name="{{ part | get_class_name }}" type="radio" value="{{ part | get_class_name }}-{{ part.id }}">
+                            <i></i>
+                            <span style = "float: right; font-size: 14px">+{{ part.Price }} €</span>
+                        </label>
+                        <a href="http://localhost:8000/catalog/?itemID={{ part.id }}" target="_blank" class="detailsLink">
+                            <div >
+                                <p>{{ part.Brand }}</p>
+                                <p>{{ part.Name }}</p>
+                                <img src="{{ part.Image.url }}">
+                            </div>
+                        </a>
                     </div>
-                </div>
-            {% if forloop.counter|divisibleby:"8" and not forloop.last %}
-            </div><div class="row">
+                {% if forloop.counter|divisibleby:"8" and not forloop.last %}
+                </div><div class="row">
             {% endif %}
             {% endfor %}
-        </div>
+                </div>
+            {% endfor %}
+            </div>
+            <div>
+                <button class="btn btn-outline-info" type="submit">Save Build</button>               
+            </div>
+        </form>
     </div>
 </div>
 {% endblock content %}

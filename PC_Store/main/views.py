@@ -75,6 +75,7 @@ def product(request, itemID, itemType='cpu'):
 
 @login_required
 def configure(request):
+
     main_models = apps.get_models('main')
     all_parts = {}
     for model in main_models:
@@ -87,3 +88,25 @@ def configure(request):
         'total': 0,
     }
     return render(request, 'main/configure.html', context)
+
+def configure_complete(request):
+    if request.method == 'POST':
+        radio_list = list()
+        for name in part_types:
+            radio_list.append(request.POST.get(name))
+
+        configuration = models.Configuration(UserID = request.user)
+        for item in radio_list:
+            values = item.split("-")
+            exec("configuration." + values[0] + " = apps.get_model('main', values[0]).objects.filter(id=values[1]).first()")
+
+        configuration.save()
+        
+    context={
+        'title': "Configuration Complete"
+    }
+    return render(request, 'main/configure_complete.html')
+    
+
+
+    

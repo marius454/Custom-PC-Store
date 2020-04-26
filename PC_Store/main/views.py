@@ -7,6 +7,7 @@ from django.apps import apps
 from django.core.serializers import serialize
 from . import models
 from django.contrib.auth.decorators import login_required
+# from django.contrib import messages
 
 
 part_types = ['CPU','GPU','Motherboard','Ram_set', 'PSU', 'Storage', 'Case', 'CPU_Cooler']
@@ -75,38 +76,91 @@ def product(request, itemID, itemType='cpu'):
 
 @login_required
 def configure(request):
-
+    
     main_models = apps.get_models('main')
     all_parts = {}
     for model in main_models:
         if model.__name__ in part_types:
             all_parts.update({model.__name__: model.objects.all()})
-
-
+            
     context = {
         'all_parts': all_parts,
         'total': 0,
+        'selections': None,
+        'message_text': None,
     }
+    if request.method == 'POST':
+        logic = configure_logic(request, context)
+        if logic:
+            context['selections'] = logic[0]
+            print(context['selections'])
+            context['message_text'] = logic[1]
+            return render(request, 'main/configure.html', context)
+        else:
+            return render(request, 'main/configure_complete.html')
+
     return render(request, 'main/configure.html', context)
 
-def configure_complete(request):
-    if request.method == 'POST':
-        radio_list = list()
-        for name in part_types:
-            radio_list.append(request.POST.get(name))
+def configure_logic(request, context):
+    # if request.method == 'POST':
+    radio_list = list()
+    for name in part_types:
+        radio_list.append(request.POST.get(name))
 
-        configuration = models.Configuration(UserID = request.user)
-        for item in radio_list:
-            values = item.split("-")
-            exec("configuration." + values[0] + " = apps.get_model('main', values[0]).objects.filter(id=values[1]).first()")
+    if None in radio_list:
+        message_text = ["Unselected fields"]
+        selections = [i for i in radio_list if i]
+        if selections:
+            return [selections, message_text]
+        else:
+            return [["none selected"], message_text]
 
-        configuration.save()
-        
-    context={
-        'title': "Configuration Complete"
+    configuration = models.Configuration(UserID = request.user)
+    for item in radio_list:
+        values = item.split("-")
+        exec("configuration." + values[0] + " = apps.get_model('main', values[0]).objects.filter(id=values[1]).first()")
+
+    # configuration.save()
+    return None
+
+@login_required
+def saved_builds(request):
+
+
+    # part = apps.get_model('main', itemType).objects.filter(id=itemID)
+    # part_serialized = serialize("python", part)[0]
+
+    # del part_serialized['fields']['Image']
+    # del part_serialized['fields']['Description']
+    # del part_serialized['fields']['Recommendations']
+    # context = {
+    #     'part_serialized': part_serialized,
+    #     'part': part.first(),
+    #     'itemType': itemType,
+    #     'itemID': itemID,
+    # }
+    # return render(request, 'main/product.html', context)
+
+
+
+    configurations = apps.get_model('main','Configuration').objects.filter(UserID=request.user)
+    conf_ser = serialize("python", configurations)
+    builds = list()
+    for i in range(0,len(conf_ser)):
+        del conf_ser[i]['fields']['UserID']
+        del conf_ser[i]['fields']['Date_Saved']
+        temp = list()
+        sum = 0
+        for key, value in conf_ser[i]['fields'].items():
+            part = apps.get_model('main', key).objects.filter(id=value).first()
+            temp.append(part)
+            sum = sum + part.Price
+        # temp = [sum] + temp
+        temp.append(sum)
+        builds.append(temp)
+
+    context = {
+        'title': "Saved Builds",
+        'builds': builds
     }
-    return render(request, 'main/configure_complete.html')
-    
-
-
-    
+    return render(request, 'main/saved_builds.html', context)

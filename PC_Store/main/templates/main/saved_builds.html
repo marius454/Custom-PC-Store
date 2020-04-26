@@ -1,0 +1,32 @@
+{% extends "main/base.html" %}
+{% load main_tags %}
+{% block content %}
+<div class="content-section">
+    <h2>These are your saved builds:</h2>
+    <div>
+        {% for build in builds %}
+            <p class="part-type">Build {{ forloop.counter }}:</p>
+            <div class="row" style="margin-bottom: 10px">
+            {% for part in build %}
+            {% if forloop.last %}
+                <div style="margin-top: 10px;">
+                    <p>Total price of this build is {{ part }} €</p>
+                </div>
+            {% else %}
+                <div class="column part-selector" style="height: 175px">
+                    <a href="http://localhost:8000/catalog/?itemID={{ part.id }}" target="_blank" class="detailsLink">
+                        <div >
+                            <p>{{ part.Brand }}</p>
+                            <p>{{ part.Name }}</p>
+                            <img src="{{ part.Image.url }}">
+                        </div>
+                    </a>
+                </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

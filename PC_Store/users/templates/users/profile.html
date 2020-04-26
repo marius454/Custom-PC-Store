@@ -15,6 +15,7 @@
             <button class="btn btn-outline-info" type="submit" id="edit" onclick="Openform()">Edit</button>
             <button class="btn btn-outline-info" type="submit" onclick="Pass()">Reset Password</button>
             <button class="btn btn-outline-info" type="submit" onclick="Email()">Update Email</button>
+            <button class="btn btn-outline-info" type="submit" onclick="Builds()">View Saved Builds</button>
         </div>
         <form method="POST" id="update" style="display:none">
             {% csrf_token %}
@@ -44,6 +45,10 @@
         function Email()
         {
             window.location.href = {% url 'email_update' %}
+        }
+        function Builds()
+        {
+            window.location.href = '/profile/saved-builds/'
         }
     </script>
 {% endblock content %}

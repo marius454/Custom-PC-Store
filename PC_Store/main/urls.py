@@ -9,5 +9,7 @@ urlpatterns = [
     path(r'catalog/<itemType>/', views.catalog, name='store-catalog'),
     path(r'catalog/<itemType>/?itemID=<itemID>', views.catalog, name='store-catalog'),
     path('configure/', views.configure, name='configure'),
-    path('configure/complete/', views.configure_complete, name='configure-complete')
+    path('profile/saved-builds/', views.saved_builds, name='saved-builds'),
+
+    # path('configure/complete/', views.configure_complete, name='configure-complete')
 ]

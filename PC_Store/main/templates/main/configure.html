@@ -29,7 +29,7 @@
                             <i></i>
                             <span style = "float: right; font-size: 14px">+{{ part.Price }} €</span>
                         </label>
-                        <a href="http://localhost:8000/catalog/?itemID={{ part.id }}" target="_blank" class="detailsLink">
+                        <a href="http://localhost:8000/catalog/{{ part | get_class_name }}/?itemID={{ part.id }}" target="_blank" class="detailsLink">
                             <div >
                                 <p>{{ part.Brand }}</p>
                                 <p>{{ part.Name }}</p>

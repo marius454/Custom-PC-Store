@@ -14,6 +14,7 @@ class Post(models.Model):
 class CPU(models.Model):
     Brand = models.CharField(max_length = 50)
     Name = models.CharField(max_length = 50)
+    Generation = models.CharField(max_length = 50, default = "field not yet filled")
     Socket = models.CharField(max_length = 10)
     Nr_of_Cores = models.IntegerField()
     Nr_of_Threads = models.IntegerField()
@@ -40,6 +41,7 @@ class GPU(models.Model):
     Ports = models.CharField(max_length = 50)
     Power = models.IntegerField()
     Recommended_System_Power = models.IntegerField()
+    Length = models.IntegerField(default = 0)
     Release_Date = models.DateField()
     Price = models.FloatField()
     Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/GPUs')
@@ -56,6 +58,8 @@ class Motherboard(models.Model):
     CPU_Brand = models.CharField(max_length = 50)
     Chipset = models.CharField(max_length = 10)
     CPU_socket = models.CharField(max_length = 10)
+    Supported_CPU_generations = models.CharField(max_length = 300, default = "field not yet filled")
+    Supported_ram_types = models.CharField(max_length=100, default = "field not yet filled")
     Nr_of_PCIe_slots = models.IntegerField()
     Nr_of_Ram_slots = models.IntegerField()
     Nr_of_Sata_ports = models.IntegerField()
@@ -89,7 +93,7 @@ class PSU(models.Model):
     Efficiency_Rating = models.CharField(max_length = 50)
     Connectors = models.CharField(max_length = 500)
     Total_Wattage = models.IntegerField()
-    Dimmension = models.CharField(max_length = 100)
+    Dimmensions = models.CharField(max_length = 100)
     Fan_size = models.IntegerField()
     Form_Factor = models.CharField(max_length = 10)
     Price = models.FloatField()
@@ -177,5 +181,4 @@ class Orders(models.Model):
     Order_Creation_Date = models.DateTimeField(default=timezone.now)
     Payment_Method = models.CharField(max_length = 50)
     Configuration = models.ForeignKey(Configuration, on_delete=models.SET_NULL, null=True)
-
 

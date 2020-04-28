@@ -7,7 +7,7 @@ from django.apps import apps
 from django.core.serializers import serialize
 from . import models
 from django.contrib.auth.decorators import login_required
-# from django.contrib import messages
+from . import myFunctions as mf
 
 
 part_types = ['CPU','GPU','Motherboard','Ram_set', 'PSU', 'Storage', 'Case', 'CPU_Cooler']
@@ -90,7 +90,7 @@ def configure(request):
         'message_text': None,
     }
     if request.method == 'POST':
-        logic = configure_logic(request, context)
+        logic = mf.configure_logic(request)
         if logic:
             context['selections'] = logic[0]
             print(context['selections'])
@@ -101,47 +101,10 @@ def configure(request):
 
     return render(request, 'main/configure.html', context)
 
-def configure_logic(request, context):
-    # if request.method == 'POST':
-    radio_list = list()
-    for name in part_types:
-        radio_list.append(request.POST.get(name))
 
-    if None in radio_list:
-        message_text = ["Unselected fields"]
-        selections = [i for i in radio_list if i]
-        if selections:
-            return [selections, message_text]
-        else:
-            return [["none selected"], message_text]
-
-    configuration = models.Configuration(UserID = request.user)
-    for item in radio_list:
-        values = item.split("-")
-        exec("configuration." + values[0] + " = apps.get_model('main', values[0]).objects.filter(id=values[1]).first()")
-
-    # configuration.save()
-    return None
 
 @login_required
 def saved_builds(request):
-
-
-    # part = apps.get_model('main', itemType).objects.filter(id=itemID)
-    # part_serialized = serialize("python", part)[0]
-
-    # del part_serialized['fields']['Image']
-    # del part_serialized['fields']['Description']
-    # del part_serialized['fields']['Recommendations']
-    # context = {
-    #     'part_serialized': part_serialized,
-    #     'part': part.first(),
-    #     'itemType': itemType,
-    #     'itemID': itemID,
-    # }
-    # return render(request, 'main/product.html', context)
-
-
 
     configurations = apps.get_model('main','Configuration').objects.filter(UserID=request.user)
     conf_ser = serialize("python", configurations)

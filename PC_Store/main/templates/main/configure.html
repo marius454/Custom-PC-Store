@@ -10,8 +10,7 @@
 
 <div class="content-section">
     <h2>Configure your PC build</h2>
-    <p>Here you can pick the part you wish to be in your computer to get the optimal machine for you</p>
-    <p>Current Price of build: {{ total }}</p>
+    <p>Here you can pick the parts you wish to be in your computer to get the optimal machine for you</p>
     <div style="margin-bottom: 20px;">
         <form method="POST">
             {% csrf_token %}
@@ -27,7 +26,7 @@
                                 {% if part|get_value in selections %} checked {% endif %}>
                             {% endwith %}
                             <i></i>
-                            <span style = "float: right; font-size: 14px">+{{ part.Price }} €</span>
+                            <span style = "float: right; font-size: 14px">{{ part.Price }} €</span>
                         </label>
                         <a href="http://localhost:8000/catalog/{{ part | get_class_name }}/?itemID={{ part.id }}" target="_blank" class="detailsLink">
                             <div >
@@ -39,13 +38,31 @@
                     </div>
                 {% if forloop.counter|divisibleby:"8" and not forloop.last %}
                 </div><div class="row">
-            {% endif %}
+                {% endif %}
             {% endfor %}
+                </div>
+                <div class="pagination", style=" margin-bottom: 10px">
+                    {% if parts.has_previous %}
+                        <a href="?page{{ key }}=1"><< &nbsp; </a>
+                        <a href="?page{{ key }}={{ parts.previous_page_number }}">< &nbsp; </a>
+                    {% endif %}
+                    {% for num in parts.paginator.page_range %}
+                        {% if parts.number == num %}
+                            <strong><a href="?page{{ key }}={{ num }}">{{ num }}</a></strong>
+                        {% elif num > parts.number|add:'-3' and num < parts.number|add:'3' %}
+                            <a href="?page{{ key }}={{ num }}">{{ num }}</a>
+                        {% endif %}
+                    {% endfor %}
+                    {% if parts.has_next %}
+                        <a href="?page{{ key }}={{ parts.next_page_number }}"> &nbsp; > &nbsp; </a>
+                        <a href="?page{{ key }}={{ parts.paginator.num_pages }}">>></a>
+                    {% endif %}
                 </div>
             {% endfor %}
             </div>
             <div>
-                <button class="btn btn-outline-info" type="submit">Save Build</button>               
+                <button class="btn btn-outline-info" name="Save" type="submit">Save Build</button>               
+                <button class="btn btn-outline-info" name="Order" type="submit">Order PC</button>               
             </div>
         </form>
     </div>

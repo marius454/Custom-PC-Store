@@ -1,0 +1,39 @@
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section" style="padding-bottom: 60px;">
+    {% if not saved %}
+    <div class="alert alert-info">
+        This builds has also been saved to your profile if you wish to continue this process later.
+    </div>
+    {% endif %}
+    <div class="col-sm-12">
+        
+        <form method="POST">
+            {% csrf_token %}
+            <table class="table">
+                <tr style="border: 0; border-bottom: solid 2px black">
+                    <td style="border-top: 0; font-weight: bold;"> Part </td>
+                    <td style="border-top: 0; font-weight: bold;"> Price </td>
+                </tr>
+                {% for item in build %}
+                    {% if not forloop.last %}
+                        <tr>
+                            <td>{{ item.Name }}</td>
+                            <td>{{ item.Price }}</td>
+                        </tr>
+                    {% else %}
+                    <tr>
+                        <td><div style="font-weight: bold; float: right;">Total:</div></td>
+                        <td>{{ item }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+            <div style="float: right">
+                <button class="btn btn-outline-info" type="submit">Checkout</button>               
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock content %}

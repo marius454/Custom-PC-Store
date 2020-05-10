@@ -7,12 +7,7 @@
         {% for build in builds %}
             <p class="part-type">Build {{ forloop.counter }}:</p>
             <div class="row" style="margin-bottom: 10px">
-            {% for part in build %}
-            {% if forloop.last %}
-                <div style="margin-top: 10px;">
-                    <p>Total price of this build is {{ part }} €</p>
-                </div>
-            {% else %}
+            {% for part in build.parts %}
                 <div class="column part-selector" style="height: 175px">
                     <a href="http://localhost:8000/catalog/?itemID={{ part.id }}" target="_blank" class="detailsLink">
                         <div >
@@ -22,11 +17,23 @@
                         </div>
                     </a>
                 </div>
-            {% endif %}
             {% endfor %}
+        </div>
+        <div style="margin-top: 10px;">
+            <p>Total price of this build is {{ build.total }} €</p>
+        </div>
+        <div style="margin-bottom: 30px;">
+            <button class="btn btn-outline-info" type="submit" onclick="Cart({{ build.confID }})">Order PC</button>
         </div>
         {% endfor %}
         </div>
     </div>
 </div>
+
+<script>
+    function Cart(confID)
+    {
+        window.location.href = '/orders/cart/' + confID.toString() + '/?saved=True';
+    }
+</script>
 {% endblock content %}

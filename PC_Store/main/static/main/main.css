@@ -83,7 +83,7 @@ body {
     font-size: 2.5rem;
   }
 
-  table {
+  .details-table {
     font: 200 16px/1.5 Helvetica, Verdana, sans-serif;
     border-collapse: collapse;
     width: 100%;
@@ -91,14 +91,14 @@ body {
     margin-right: auto;
 }
 
-td, th {
+.details-table td, th {
     border: 1px solid #dddddd;
     text-align: left;
     padding: 8px;
     font-weight:normal
 }
 
-tr:nth-child(even) {
+.details-table tr:nth-child(even) {
     background-color: #dddddd;
 }
 

@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from django.urls import resolve
 from django.views.generic import ListView
 from django.core.paginator import Paginator
@@ -8,7 +9,7 @@ from django.core.serializers import serialize
 from . import models
 from django.contrib.auth.decorators import login_required
 from . import myFunctions as mf
-
+from django.shortcuts import reverse
 
 part_types = ['CPU','GPU','Motherboard','Ram_set', 'PSU', 'Storage', 'Case', 'CPU_Cooler']
 
@@ -24,12 +25,6 @@ def home(request):
         'posts': posts,
     }
     return render(request, 'main/home.html', context)
-  
-# class PostListView(ListView):
-#     model = models.Post
-#     template_name = 'main/home.html'
-#     context_object_name = 'posts'
-#     ordering = ['-date_posted']
 
 
 def about(request):
@@ -47,7 +42,7 @@ def catalog(request, itemType='cpu'):
     parts = apps.get_model('main', itemType).objects.all()
     parts = parts.order_by('Price')
 
-    paginator = Paginator(parts, 2)
+    paginator = Paginator(parts, 20)
     page = request.GET.get('page')
     parts = paginator.get_page(page)
 
@@ -78,11 +73,20 @@ def product(request, itemID, itemType='cpu'):
 def configure(request):
     
     main_models = apps.get_models('main')
-    all_parts = {}
+    all_parts = dict()
     for model in main_models:
         if model.__name__ in part_types:
             all_parts.update({model.__name__: model.objects.all()})
-            
+    
+    temp = dict()
+    for key, parts in all_parts.items():
+        parts = parts.order_by('Price')
+        paginator = Paginator(parts, 20)
+        page = request.GET.get(f'page{key}')
+        parts = paginator.get_page(page)
+        temp.update({ key: parts })
+    all_parts = temp
+
     context = {
         'all_parts': all_parts,
         'total': 0,
@@ -91,13 +95,16 @@ def configure(request):
     }
     if request.method == 'POST':
         logic = mf.configure_logic(request)
-        if logic:
-            context['selections'] = logic[0]
-            print(context['selections'])
-            context['message_text'] = logic[1]
+        if logic[0]:
+            context['selections'] = logic[0][0]
+            context['message_text'] = logic[0][1]
             return render(request, 'main/configure.html', context)
         else:
-            return render(request, 'main/configure_complete.html')
+            if 'Save' in request.POST:
+                return render(request, 'main/configure_complete.html')
+            elif 'Order' in request.POST:
+                return HttpResponseRedirect(reverse('shopping-cart', kwargs={'confID': logic[1]}))
+                # return HttpResponseRedirect(f'orders/cart/{logic[1]}')
 
     return render(request, 'main/configure.html', context)
 
@@ -106,21 +113,26 @@ def configure(request):
 @login_required
 def saved_builds(request):
 
-    configurations = apps.get_model('main','Configuration').objects.filter(UserID=request.user)
-    conf_ser = serialize("python", configurations)
+    configurations = apps.get_model('main','Saved_build').objects.filter(Belongs_to_user=request.user)
+    saved_ser = serialize("python", configurations)
+    conf_ser = []
+
+    for item in saved_ser:
+        conf = apps.get_model('main','Configuration').objects.filter(id = item['fields']['Configuration'])
+        conf_ser += serialize("python", conf)
+
+    
     builds = list()
     for i in range(0,len(conf_ser)):
-        del conf_ser[i]['fields']['UserID']
         del conf_ser[i]['fields']['Date_Saved']
         temp = list()
         sum = 0
         for key, value in conf_ser[i]['fields'].items():
             part = apps.get_model('main', key).objects.filter(id=value).first()
             temp.append(part)
-            sum = sum + part.Price
-        # temp = [sum] + temp
-        temp.append(sum)
-        builds.append(temp)
+            sum = sum + float(part.Price)
+        sum = round(sum, 2)
+        builds.append({'parts': temp, 'total': sum, 'confID': conf_ser[i]['pk']})
 
     context = {
         'title': "Saved Builds",

@@ -24,15 +24,25 @@ def configure_logic(request):
     if message_text:
         if not selections:
             selections.append("none selected")
-        return [selections, message_text]
+        return [[selections, message_text]]
 
-    configuration = models.Configuration(UserID = request.user)
+    configuration = models.Configuration()
+    # sum = 0
     for item in selections:
         values = item.split("-")
-        exec("configuration." + values[0] + " = apps.get_model('main', values[0]).objects.filter(id=values[1]).first()")
+        model = apps.get_model('main', values[0]).objects.filter(id=values[1]).first()
+        exec("configuration." + values[0] + " = model")
+        # sum += model.Price
 
-    # configuration.save()
-    return None
+    # configuration.Total = sum
+
+    configuration.save()
+
+    saved_build = models.Saved_build(Belongs_to_user = request.user, Configuration = configuration)
+    saved_build.save()
+    
+    return [None, configuration.id]
+
 
 def compat_validation(parts, message_text):
     if "CPU" in parts and "Motherboard" in parts:
@@ -45,30 +55,34 @@ def compat_validation(parts, message_text):
             message_text.append("The GPU is too long for the selected case")
 
     if "Case" in parts and "CPU_Cooler" in parts:
-        if parts['CPU_Cooler'].Dimmensions.split(" x ")[2] >= parts['Case'].Max_CPU_Cooler_height:
+        if float(parts['CPU_Cooler'].Dimmensions.split(" x ")[2]) >= parts['Case'].Max_CPU_Cooler_height:
             message_text.append("The CPU cooler is too tall for the selected case")
 
     if "Case" in parts and "Motherboard" in parts:
-        if not parts['Motherboard'].Form_Factor in parts['Case'].Supported_Motherboard_Form_Factors:
+        if not parts['Motherboard'].Form_Factor in parts['Case'].Supported_Motherboard_Form_Factors.split(", "):
             message_text.append("Selected case does not support the motherboard form factor")
 
     if "Storage" in parts and "Motherboard" in parts:
         if parts['Storage'].Connection == "M.2" and parts['Motherboard'].Nr_of_mdot2_slots == 0:
             message_text.append("Selected motherboard does not support m.2 storage")
-        if parts['Storage'].Connection == "SATA" and parts['Motherboard'].Nr_of_Sata_slots == 0:
+        if parts['Storage'].Connection == "SATA" and parts['Motherboard'].Nr_of_Sata_ports == 0:
             message_text.append("Selected motherboard does not support SATA storage")
 
     if "GPU" in parts and "PSU" in parts:
         if parts['GPU'].Recommended_System_Power > parts['PSU'].Total_Wattage:
-            message_text.append("Power supply does not achieve rocommended power output")
+            message_text.append("Power supply does not achieve recommended power output")
         elif "CPU" in parts:
             needed_power = parts['GPU'].Power + parts['CPU'].TDP
             needed_power = needed_power + 0.4*needed_power
             if needed_power > parts['PSU'].Total_Wattage:
-                message_text.append("Power supply does not achieve rocommended power output")
+                message_text.append("Power supply does not achieve recommended power output")
                 
     if "Ram_set" in parts and "Motherboard" in parts:
         if parts['Ram_set'].Nr_of_Sticks > parts['Motherboard'].Nr_of_Ram_slots:
             message_text.append("Motherboard does not have enough slots for selected ram set")
+    
+    if "Case" in parts and "PSU" in parts:
+        if not parts['PSU'].Form_Factor in parts['Case'].Supported_PSU_Form_Factor.split(", "):
+            message_text.append("Selected case does not support PSU form factor")
     
 

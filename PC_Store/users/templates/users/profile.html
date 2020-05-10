@@ -29,26 +29,27 @@
             </div>
         </form>
     </div>
-    <script>
-        function Openform()
-        {
-            if (document.getElementById('update').style.display == 'none'){
-                document.getElementById('update').style.display = '';
-            } else{
-                document.getElementById('update').style.display = 'none';
-            }
+<script>
+    function Openform()
+    {
+        if (document.getElementById('update').style.display == 'none'){
+            document.getElementById('update').style.display = '';
+        } else{
+            document.getElementById('update').style.display = 'none';
         }
-        function Pass()
-        {
-            window.location.href = {% url 'password_reset' %}
-        }
-        function Email()
-        {
-            window.location.href = {% url 'email_update' %}
-        }
-        function Builds()
-        {
-            window.location.href = '/profile/saved-builds/'
-        }
-    </script>
+    }
+    function Pass()
+    {
+        window.location.href = {% url 'password_reset' %}
+    }
+    function Email()
+    {
+        window.location.href = {% url 'email_update' %}
+    }
+    function Builds()
+    {
+        window.location.href = '/profile/saved-builds/'
+    }
+</script>
+
 {% endblock content %}

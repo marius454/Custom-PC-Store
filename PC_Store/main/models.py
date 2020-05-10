@@ -14,7 +14,7 @@ class Post(models.Model):
 class CPU(models.Model):
     Brand = models.CharField(max_length = 50)
     Name = models.CharField(max_length = 50)
-    Generation = models.CharField(max_length = 50, default = "field not yet filled")
+    Generation = models.CharField(max_length = 50)
     Socket = models.CharField(max_length = 10)
     Nr_of_Cores = models.IntegerField()
     Nr_of_Threads = models.IntegerField()
@@ -41,7 +41,7 @@ class GPU(models.Model):
     Ports = models.CharField(max_length = 50)
     Power = models.IntegerField()
     Recommended_System_Power = models.IntegerField()
-    Length = models.IntegerField(default = 0)
+    Length = models.IntegerField()
     Release_Date = models.DateField()
     Price = models.FloatField()
     Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/GPUs')
@@ -58,8 +58,8 @@ class Motherboard(models.Model):
     CPU_Brand = models.CharField(max_length = 50)
     Chipset = models.CharField(max_length = 10)
     CPU_socket = models.CharField(max_length = 10)
-    Supported_CPU_generations = models.CharField(max_length = 300, default = "field not yet filled")
-    Supported_ram_types = models.CharField(max_length=100, default = "field not yet filled")
+    Supported_CPU_generations = models.CharField(max_length = 300)
+    Supported_ram_types = models.CharField(max_length=100)
     Nr_of_PCIe_slots = models.IntegerField()
     Nr_of_Ram_slots = models.IntegerField()
     Nr_of_Sata_ports = models.IntegerField()
@@ -126,6 +126,7 @@ class Case(models.Model):
     Name = models.CharField(max_length = 50)
     Color = models.CharField(max_length = 50)
     Supported_Motherboard_Form_Factors = models.CharField(max_length = 100)
+    Supported_PSU_Form_Factor = models.CharField(max_length = 50, default = "field not filed")
     Fans = models.CharField(max_length = 100)
     Dimmensions = models.CharField(max_length = 50)
     Max_GPU_lenght = models.IntegerField()
@@ -146,7 +147,7 @@ class CPU_Cooler(models.Model):
     Noise_Level = models.CharField(max_length = 50)
     Material = models.CharField(max_length = 500)
     Dimmensions = models.CharField(max_length = 50)
-    Price = models.FloatField()
+    Price = models.DecimalField(max_digits=6, decimal_places=2)
     Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/CPU_Coolers')
     Description = models.TextField(default="not yet available")
     Recommendations = models.TextField(default="not yet available")
@@ -155,7 +156,7 @@ class CPU_Cooler(models.Model):
         return f'{self.Brand} {self.Name}'
 
 class Configuration(models.Model):
-    UserID = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
+    # UserID = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     CPU = models.ForeignKey(CPU, on_delete=models.SET_NULL, null=True)
     GPU = models.ForeignKey(GPU, on_delete=models.SET_NULL, null=True)
     Motherboard = models.ForeignKey(Motherboard, on_delete=models.SET_NULL, null=True)
@@ -164,21 +165,25 @@ class Configuration(models.Model):
     Storage = models.ForeignKey(Storage, on_delete=models.SET_NULL, null=True)
     Case = models.ForeignKey(Case, on_delete=models.SET_NULL, null=True)
     CPU_Cooler = models.ForeignKey(CPU_Cooler, on_delete=models.SET_NULL, null=True)
+    # Total = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
     Date_Saved = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
-        return f'Saved build of user {self.UserID} - {self.Date_Saved}'
+        return f'Configuration saved at - {self.Date_Saved}'
 
 class Saved_build(models.Model):
     Belongs_to_user = models.ForeignKey(User, on_delete=models.CASCADE)
     Configuration = models.ForeignKey(Configuration, on_delete=models.CASCADE)
 
-class Orders(models.Model):
-    Recipient_First_Name = models.CharField(max_length = 50)
-    Recipient_Last_Name = models.CharField(max_length = 50)
-    Billing_address = models.CharField(max_length = 50)
-    Delivery_address = models.CharField(max_length = 50)
-    Order_Creation_Date = models.DateTimeField(default=timezone.now)
-    Payment_Method = models.CharField(max_length = 50)
-    Configuration = models.ForeignKey(Configuration, on_delete=models.SET_NULL, null=True)
+    def __str__(self):
+        return f'Build saved my {self.Belongs_to_user} - {self.Configuration.Date_Saved}'
 
+
+# class Orders(models.Model):
+#     Recipient_First_Name = models.CharField(max_length = 50)
+#     Recipient_Last_Name = models.CharField(max_length = 50)
+#     Billing_address = models.CharField(max_length = 50)
+#     Delivery_address = models.CharField(max_length = 50)
+#     Order_Creation_Date = models.DateTimeField(default=timezone.now)
+#     Payment_Method = models.CharField(max_length = 50)
+#     Configuration = models.ForeignKey(Configuration, on_delete=models.SET_NULL, null=True)

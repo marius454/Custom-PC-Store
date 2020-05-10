@@ -1,5 +1,4 @@
 from django.urls import path
-# from .views import PostListView
 from . import views
 
 urlpatterns = [
@@ -10,6 +9,4 @@ urlpatterns = [
     path(r'catalog/<itemType>/?itemID=<itemID>', views.catalog, name='store-catalog'),
     path('configure/', views.configure, name='configure'),
     path('profile/saved-builds/', views.saved_builds, name='saved-builds'),
-
-    # path('configure/complete/', views.configure_complete, name='configure-complete')
 ]

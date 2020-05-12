@@ -71,7 +71,20 @@ def product(request, itemID, itemType='cpu'):
 
 # @login_required
 def configure(request):
-    
+    confID = request.GET.get('confID')
+    conf = None
+    selections = None
+    if confID:
+        conf = apps.get_model('main','Configuration').objects.filter(id = confID)
+    if conf.first():
+        selections = []
+        conf_ser = serialize("python", conf)
+        del conf_ser[0]['fields']['Date_Saved']
+        sum = 0
+        for key, value in conf_ser[0]['fields'].items():
+            part = apps.get_model('main', key).objects.filter(id=value).first()
+            selections.append(part.__class__.__name__ + "-" + str(part.id))
+
     main_models = apps.get_models('main')
     all_parts = dict()
     for model in main_models:
@@ -90,7 +103,7 @@ def configure(request):
     context = {
         'all_parts': all_parts,
         'total': 0,
-        'selections': None,
+        'selections': selections,
         'message_text': None,
     }
     if request.method == 'POST':
@@ -108,33 +121,27 @@ def configure(request):
     return render(request, 'main/configure.html', context)
 
 
-
 @login_required
 def saved_builds(request):
 
-    configurations = apps.get_model('main','Saved_build').objects.filter(Belongs_to_user=request.user)
-    saved_ser = serialize("python", configurations)
-    conf_ser = []
-
-    for item in saved_ser:
-        conf = apps.get_model('main','Configuration').objects.filter(id = item['fields']['Configuration'])
-        conf_ser += serialize("python", conf)
-
-    
-    builds = list()
-    for i in range(0,len(conf_ser)):
-        del conf_ser[i]['fields']['Date_Saved']
-        temp = list()
-        sum = 0
-        for key, value in conf_ser[i]['fields'].items():
-            part = apps.get_model('main', key).objects.filter(id=value).first()
-            temp.append(part)
-            sum = sum + float(part.Price)
-        sum = round(sum, 2)
-        builds.append({'parts': temp, 'total': sum, 'confID': conf_ser[i]['pk']})
+    builds, conf_ser = mf.get_saved_builds(request.user)
 
     context = {
         'title': "Saved Builds",
         'builds': builds
     }
     return render(request, 'main/saved_builds.html', context)
+
+def recommended_builds(request):
+
+    builds, conf_ser = mf.get_saved_builds(None)
+
+    context = {
+        'title': "Saved Builds",
+        'builds': builds
+    }
+    return render(request, 'main/recommended_builds.html', context)
+
+
+
+

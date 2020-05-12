@@ -1,0 +1,28 @@
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section">
+    <h1 style="border-bottom: solid 1px darkgrey; padding-bottom: 20px;">
+        Select from some pre-made, recommended builds:
+    </h1>
+    <div class="row" style = "margin-bottom: 30px;">
+        {% for build in builds %}
+        <a href="{% url 'configure' %}?confID={{ build.confID }}" class="catalogLink" style="width: 33.2333%">
+            <div class="column" style = "position:relative;top:20px;width:100%;border-style:groove;border-color:lightgrey;height:500px;overflow:hidden;">
+                <h4>{{ build.name }}</h4>
+                {# <img style="max-width:100%;max-height:67.5%;display: block;margin-left: auto;margin-right: auto;"src="{{ part.Image.url }}"> --> #}
+                <div style="bottom: 0;position:absolute;">
+                    {% for part in build.parts %}
+                        <p style="margin-bottom:0;font-size: 20px;">{{ part.Name }}: <b>{{ part.Price }}€</b></p>
+                    {% endfor %}
+                    <p style="margin-bottom:0;font-size: 20px;">Total Price: <b>{{ build.total }}€</b></p>
+                </div>
+            </div>
+        </a>
+        {% if forloop.counter|divisibleby:"3" and not forloop.last %}
+        </div><div class="row">
+        {% endif %}
+        {% endfor %}
+    </div>
+</div>
+{% endblock content %}

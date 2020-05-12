@@ -34,11 +34,11 @@
     <div class="row">
         {% for part in parts %}
         <a href="?itemID={{ part.id }}" class="catalogLink">
-            <div class="column" style = "position:relative;top:20px;width:100%;border-style:groove;border-color:lightgrey;height:400px;overflow:hidden;">
+            <div class="column catalog-column">
                 <h2>{{ part.Brand }}</h2>
                 <h2>{{ part.Name }}</h2>
-                <img style="max-width:100%;max-height:67.5%;display: block;margin-left: auto;margin-right: auto;"src="{{ part.Image.url }}">
-                <p style="margin-bottom:0;position:absolute; bottom:0;font-size: 20px;">Price: {{ part.Price }} €</p>
+                <img src="{{ part.Image.url }}">
+                <p>Price: {{ part.Price }} €</p>
             </div>
         </a>
         {% if forloop.counter|divisibleby:"4" and not forloop.last %}

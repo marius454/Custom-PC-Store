@@ -9,4 +9,5 @@ urlpatterns = [
     path(r'catalog/<itemType>/?itemID=<itemID>', views.catalog, name='store-catalog'),
     path('configure/', views.configure, name='configure'),
     path('profile/saved-builds/', views.saved_builds, name='saved-builds'),
+    path('recommended_builds/', views.recommended_builds, name="recommended-builds"),
 ]

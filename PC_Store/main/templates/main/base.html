@@ -61,6 +61,28 @@
             .detailsLink:visited{
                 color:black;
             }
+            .catalog-column {
+                position:relative;
+                top:20px;
+                width:100%;
+                border-style:groove;
+                border-color:lightgrey;
+                height:400px;
+                overflow:hidden;
+            }
+            .catalog-column img {
+                max-width:100%;
+                max-height:67.5%;
+                display: block;
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .catalog-column p {
+                margin-bottom:0;
+                position:absolute;
+                bottom:0;
+                font-size: 20px;
+            }
             
 
         </style>
@@ -84,6 +106,7 @@
                             <a class="nav-item nav-link" href="{% url 'store-home' %}">Home</a>
                             <a class="nav-item nav-link" href="{% url 'store-about' %}">About</a>
                             <a class="nav-item nav-link" href="{% url 'store-catalog' %}">Catalog</a>
+                            <a class="nav-item nav-link" href="{% url 'recommended-builds' %}">Recommended Builds</a>
                         </div>
                         <!-- Navbar Right Side -->
                         <div class="navbar-nav">

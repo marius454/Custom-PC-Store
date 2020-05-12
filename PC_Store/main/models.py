@@ -172,18 +172,44 @@ class Configuration(models.Model):
         return f'Configuration saved at - {self.Date_Saved}'
 
 class Saved_build(models.Model):
-    Belongs_to_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    Name = models.CharField(max_length=50, null=True)
+    Belongs_to_user = models.ForeignKey(User, on_delete=models.CASCADE, null = True, blank=True)
     Configuration = models.ForeignKey(Configuration, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f'Build saved my {self.Belongs_to_user} - {self.Configuration.Date_Saved}'
+        if self.Belongs_to_user:
+            return f'Build saved by user {self.Belongs_to_user} - {self.Configuration.Date_Saved}'
+        else:
+            if self.Name:
+                return f'Build saved by admin - {self.Name}'
+            else:
+                return f'Build saved by admin - {self.Configuration.Date_Saved}'
 
+class Sound_card(models.Model):
+    Brand = models.CharField(max_length = 50)
+    Name = models.CharField(max_length = 50)
+    Connection = models.CharField(max_length = 20)
+    Internal = models.BooleanField()
+    Channel = models.CharField(max_length=10)
+    High_Res_audio = models.CharField(max_length = 20)
+    Price = models.DecimalField(max_digits=6, decimal_places=2)
+    Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/CPU_Coolers')
+    Description = models.TextField(default="not yet available")
+    Recommendations = models.TextField(default="not yet available")
 
-# class Orders(models.Model):
-#     Recipient_First_Name = models.CharField(max_length = 50)
-#     Recipient_Last_Name = models.CharField(max_length = 50)
-#     Billing_address = models.CharField(max_length = 50)
-#     Delivery_address = models.CharField(max_length = 50)
-#     Order_Creation_Date = models.DateTimeField(default=timezone.now)
-#     Payment_Method = models.CharField(max_length = 50)
-#     Configuration = models.ForeignKey(Configuration, on_delete=models.SET_NULL, null=True)
+    def __str__(self):
+        return f'{self.Brand} {self.Name}'
+
+class Optical_Drive(models.Model):
+    Brand = models.CharField(max_length = 50)
+    Name = models.CharField(max_length = 50)
+
+    def __str__(self):
+        return f'{self.Brand} {self.Name}'
+
+class Monitor(models.Model):
+    Brand = models.CharField(max_length = 50)
+    Name = models.CharField(max_length = 50)
+
+    def __str__(self):
+        return f'{self.Brand} {self.Name}'

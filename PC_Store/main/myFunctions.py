@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.core.serializers import serialize
 from . import models
+from django.apps import apps
 
 part_types = ['CPU','GPU','Motherboard','Ram_set', 'PSU', 'Storage', 'Case', 'CPU_Cooler']
 
@@ -85,5 +86,31 @@ def compat_validation(parts, message_text):
     if "Case" in parts and "PSU" in parts:
         if not parts['PSU'].Form_Factor in parts['Case'].Supported_PSU_Form_Factor.split(", "):
             message_text.append("Selected case does not support PSU form factor")
-    
+
+
+def get_saved_builds(user):
+    saved_builds = apps.get_model('main','Saved_build').objects.filter(Belongs_to_user=user)
+    saved_ser = serialize("python", saved_builds)
+    conf_ser = []
+    names = []
+    for item in saved_ser:
+        names.append(item['fields']['Name'])
+
+    for item in saved_ser:
+        conf = apps.get_model('main','Configuration').objects.filter(id = item['fields']['Configuration'])
+        conf_ser += serialize("python", conf)
+
+    builds = list()
+    for i in range(0,len(conf_ser)):
+        del conf_ser[i]['fields']['Date_Saved']
+        temp = list()
+        sum = 0
+        for key, value in conf_ser[i]['fields'].items():
+            part = apps.get_model('main', key).objects.filter(id=value).first()
+            temp.append(part)
+            sum = sum + float(part.Price)
+        sum = round(sum, 2)
+        builds.append({'name':names[i], 'parts': temp, 'total': sum, 'confID': conf_ser[i]['pk']})
+
+    return (builds, conf_ser)
 

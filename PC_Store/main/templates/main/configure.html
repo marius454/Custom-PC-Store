@@ -61,7 +61,9 @@
             {% endfor %}
             </div>
             <div>
-                <button class="btn btn-outline-info" name="Save" type="submit">Save Build</button>               
+                {% if user.is_authenticated %}
+                    <button class="btn btn-outline-info" name="Save" type="submit">Save Build</button>
+                {% endif %}
                 <button class="btn btn-outline-info" name="Order" type="submit">Order PC</button>               
             </div>
         </form>

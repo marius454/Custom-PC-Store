@@ -1,0 +1,12 @@
+{% extends "main/base.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="content-section">
+    <div class="alert alert-info">
+        You have successfully ordered your PC
+    </div>
+    {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}"> View orders in profile </a>
+    {% endif %}
+</div>
+{% endblock content %}

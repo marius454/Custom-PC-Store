@@ -38,8 +38,9 @@ def configure_logic(request):
 
     configuration.save()
 
-    saved_build = models.Saved_build(Belongs_to_user = request.user, Configuration = configuration)
-    saved_build.save()
+    if request.user.is_authenticated:
+        saved_build = models.Saved_build(Belongs_to_user = request.user, Configuration = configuration)
+        saved_build.save()
     
     return [None, configuration.id]
 

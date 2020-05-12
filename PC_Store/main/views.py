@@ -69,7 +69,7 @@ def product(request, itemID, itemType='cpu'):
     }
     return render(request, 'main/product.html', context)
 
-@login_required
+# @login_required
 def configure(request):
     
     main_models = apps.get_models('main')
@@ -104,7 +104,6 @@ def configure(request):
                 return render(request, 'main/configure_complete.html')
             elif 'Order' in request.POST:
                 return HttpResponseRedirect(reverse('shopping-cart', kwargs={'confID': logic[1]}))
-                # return HttpResponseRedirect(f'orders/cart/{logic[1]}')
 
     return render(request, 'main/configure.html', context)
 

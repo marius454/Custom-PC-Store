@@ -87,8 +87,8 @@
                         </div>
                         <!-- Navbar Right Side -->
                         <div class="navbar-nav">
+                            <a class="nav-item nav-link" href="{% url 'configure' %}">Build PC</a>
                             {% if user.is_authenticated %}
-                                <a class="nav-item nav-link" href="{% url 'configure' %}">Build PC</a>
                                 <a class="nav-item nav-link" href="{% url 'profile' %}">{{ user.username }}</a>
                                 <a class="nav-item nav-link" href="{% url 'logout' %}">Logout</a>
                             {% else %}

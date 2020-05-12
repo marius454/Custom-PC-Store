@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
 <div class="content-section" style="padding-bottom: 60px;">
-    {% if not saved %}
+    {% if not saved and user.is_authenticated %}
     <div class="alert alert-info">
         This builds has also been saved to your profile if you wish to continue this process later.
     </div>

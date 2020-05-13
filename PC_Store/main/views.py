@@ -11,7 +11,9 @@ from django.contrib.auth.decorators import login_required
 from . import myFunctions as mf
 from django.shortcuts import reverse
 
-part_types = ['CPU','GPU','Motherboard','Ram_set', 'PSU', 'Storage', 'Case', 'CPU_Cooler']
+part_types = ['CPU','GPU','Motherboard','Ram_set', 'PSU',
+ 'Storage', 'Case', 'CPU_Cooler','Optical_Drive',
+  'Sound_Card', 'Monitor', 'Operating_System']
 
 def home(request):
     posts = models.Post.objects.all().order_by('-date_posted')
@@ -72,18 +74,18 @@ def product(request, itemID, itemType='cpu'):
 # @login_required
 def configure(request):
     confID = request.GET.get('confID')
-    conf = None
     selections = None
     if confID:
         conf = apps.get_model('main','Configuration').objects.filter(id = confID)
-    if conf.first():
-        selections = []
-        conf_ser = serialize("python", conf)
-        del conf_ser[0]['fields']['Date_Saved']
-        sum = 0
-        for key, value in conf_ser[0]['fields'].items():
-            part = apps.get_model('main', key).objects.filter(id=value).first()
-            selections.append(part.__class__.__name__ + "-" + str(part.id))
+        if conf.first():
+            selections = []
+            conf_ser = serialize("python", conf)
+            del conf_ser[0]['fields']['Date_Saved']
+            sum = 0
+            for key, value in conf_ser[0]['fields'].items():
+                if value:
+                    part = apps.get_model('main', key).objects.filter(id=value).first()
+                    selections.append(part.__class__.__name__ + "-" + str(part.id))
 
     main_models = apps.get_models('main')
     all_parts = dict()

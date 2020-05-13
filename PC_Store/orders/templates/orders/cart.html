@@ -19,13 +19,13 @@
                 {% for item in build %}
                     {% if not forloop.last %}
                         <tr>
-                            <td>{{ item.Name }}</td>
-                            <td>{{ item.Price }}</td>
+                            <td>{{ item.Brand }} {{ item.Name }}</td>
+                            <td>{{ item.Price }}€</td>
                         </tr>
                     {% else %}
                     <tr>
                         <td><div style="font-weight: bold; float: right;">Total:</div></td>
-                        <td>{{ item }}</td>
+                        <td>{{ item }}€</td>
                     </tr>
                     {% endif %}
                 {% endfor %}

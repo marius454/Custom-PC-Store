@@ -9,13 +9,11 @@ from django.core.validators import RegexValidator
 
 STATUS_CHOICES = (
     ("Started", "Started"),
+    ("Being processed","Being processed"),
+    ("Shipped","Shipped"),
     ("Cancelled","Cancelled"),
     ("Finished", "Finished"),
 )
-# alphanumeric = RegexValidator(r'^[0-9a-zA-Z]*$', 'Only alphanumeric characters are allowed.')
-# alpha = RegexValidator(r'^[a-zA-Z]*$', 'Only letters are allowed.')
-# numeric = RegexValidator(r'^[0-9]*$', 'Only numeric characters are allowed.')
-# num_and_slash = RegexValidator(r'^[0-9/]*$', 'Only numeric characters and a slash are allowed.')
 
 
 class Order(models.Model):

@@ -4,11 +4,16 @@ from . import models
 from django.apps import apps
 
 part_types = ['CPU','GPU','Motherboard','Ram_set', 'PSU', 'Storage', 'Case', 'CPU_Cooler']
+optional_types = ['Optical_Drive', 'Sound_Card', 'Monitor', 'Operating_System']
 
 def configure_logic(request):
     radio_list = list()
     for name in part_types:
         radio_list.append(request.POST.get(name))
+    for name in optional_types:
+        post = request.POST.get(name)
+        if post:
+            radio_list.append(post)
 
     message_text = list()
     selections = [i for i in radio_list if i]
@@ -16,10 +21,13 @@ def configure_logic(request):
     parts = dict()
     for item in selections:
         values = item.split("-")
-        parts.update({ values[0]: apps.get_model('main', values[0]).objects.filter(id=values[1]).first() })
+        if values[1] == "0" and values[0] not in optional_types:
+            radio_list.append(None)
+        if values[1] != "0":
+            parts.update({ values[0]: apps.get_model('main', values[0]).objects.filter(id=values[1]).first() })
 
     if None in radio_list:
-        message_text.append("Unselected fields")
+        message_text.append("Unselected mandatory fields")
     compat_validation(parts, message_text)
 
     if message_text:
@@ -28,14 +36,10 @@ def configure_logic(request):
         return [[selections, message_text]]
 
     configuration = models.Configuration()
-    # sum = 0
     for item in selections:
         values = item.split("-")
         model = apps.get_model('main', values[0]).objects.filter(id=values[1]).first()
         exec("configuration." + values[0] + " = model")
-        # sum += model.Price
-
-    # configuration.Total = sum
 
     configuration.save()
 
@@ -87,6 +91,14 @@ def compat_validation(parts, message_text):
         if not parts['PSU'].Form_Factor in parts['Case'].Supported_PSU_Form_Factor.split(", "):
             message_text.append("Selected case does not support PSU form factor")
 
+    if "Optical_Drive" in parts and "Case" in parts:
+        if not parts['Case'].Optical_Drive_support:
+            message_text.append("Selected case does not support optical drives")
+
+    if "Sound_Card" in parts and "Motherboard" in parts:
+        if (parts['Motherboard'].Nr_of_PCIe_x16_slots + parts['Motherboard'].Nr_of_PCIe_x4_slots + parts['Motherboard'].Nr_of_PCIe_x1_slots) < 2:
+            message_text.append("Selected motherboard does not have enough PCI Express connection to support a sound card")
+
 
 def get_saved_builds(user):
     saved_builds = apps.get_model('main','Saved_build').objects.filter(Belongs_to_user=user)
@@ -106,9 +118,10 @@ def get_saved_builds(user):
         temp = list()
         sum = 0
         for key, value in conf_ser[i]['fields'].items():
-            part = apps.get_model('main', key).objects.filter(id=value).first()
-            temp.append(part)
-            sum = sum + float(part.Price)
+            if value:
+                part = apps.get_model('main', key).objects.filter(id=value).first()
+                temp.append(part)
+                sum = sum + float(part.Price)
         sum = round(sum, 2)
         builds.append({'name':names[i], 'parts': temp, 'total': sum, 'confID': conf_ser[i]['pk']})
 

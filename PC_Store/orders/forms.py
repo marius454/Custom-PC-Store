@@ -12,7 +12,10 @@ class CheckoutForm(forms.ModelForm):
         'phone', 'country', 'delivery_address']
 
 class PaymentForm(forms.ModelForm):
-    security_code = SecurityCodeField(max_length = 4, label = 'CVV/CVC')
+    security_code = SecurityCodeField(max_length = 4, label = 'CVV/CVC', widget=forms.TextInput(attrs={
+        'placeholder': "123",
+        'id': "CVV",
+        }))
     card_expiration_date = forms.CharField(max_length=5, min_length=5, widget=forms.TextInput(attrs={
         'placeholder': "MM YY",
         'id': "expDate",

@@ -60,7 +60,9 @@ class Motherboard(models.Model):
     CPU_socket = models.CharField(max_length = 10)
     Supported_CPU_generations = models.CharField(max_length = 300)
     Supported_ram_types = models.CharField(max_length=100)
-    Nr_of_PCIe_slots = models.IntegerField()
+    Nr_of_PCIe_x16_slots = models.IntegerField()
+    Nr_of_PCIe_x4_slots = models.IntegerField(default = 0)
+    Nr_of_PCIe_x1_slots = models.IntegerField(default = 0)
     Nr_of_Ram_slots = models.IntegerField()
     Nr_of_Sata_ports = models.IntegerField()
     Nr_of_mdot2_slots = models.IntegerField()
@@ -131,6 +133,7 @@ class Case(models.Model):
     Dimmensions = models.CharField(max_length = 50)
     Max_GPU_lenght = models.IntegerField()
     Max_CPU_Cooler_height = models.IntegerField()
+    Optical_Drive_support = models.BooleanField(default = True)
     Price = models.FloatField()
     Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/Cases')
     Description = models.TextField(default="not yet available")
@@ -155,8 +158,64 @@ class CPU_Cooler(models.Model):
     def __str__(self):
         return f'{self.Brand} {self.Name}'
 
+class Sound_Card(models.Model):
+    Brand = models.CharField(max_length = 50)
+    Name = models.CharField(max_length = 50)
+    Connection = models.CharField(max_length = 20)
+    Internal = models.BooleanField()
+    Channel = models.CharField(max_length=10)
+    High_Res_audio = models.CharField(max_length = 20)
+    Price = models.DecimalField(max_digits=6, decimal_places=2)
+    Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/Sound_Cards')
+    Description = models.TextField(default="not yet available")
+    Recommendations = models.TextField(default="not yet available")
+
+    def __str__(self):
+        return f'{self.Brand} {self.Name}'
+
+class Optical_Drive(models.Model):
+    Brand = models.CharField(max_length = 50)
+    Name = models.CharField(max_length = 50)
+    Read_Speed = models.TextField(max_length=500)
+    Write_Speed = models.TextField(max_length=500)
+    Access_Time = models.CharField(max_length=50)
+    Connection = models.CharField(max_length=20)
+    Mounting_Orientation = models.CharField(max_length=50)
+    Price = models.DecimalField(max_digits=6, decimal_places=2)
+    Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/Optical_Drives')
+    Description = models.TextField(default="not yet available")
+    Recommendations = models.TextField(default="not yet available")
+
+    def __str__(self):
+        return f'{self.Brand} {self.Name}'
+
+class Monitor(models.Model):
+    Brand = models.CharField(max_length = 50)
+    Name = models.CharField(max_length = 50)
+    Aspect_Ratio = models.CharField(max_length = 10)
+    Diameter = models.CharField(max_length = 10)
+    Resolution = models.CharField(max_length = 20)
+    Refresh_Rate = models.CharField(max_length = 20)
+    Connections = models.CharField(max_length = 100)
+    Display_Technology = models.CharField(max_length = 50)
+    Price = models.DecimalField(max_digits=6, decimal_places=2)
+    Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/Monitors')
+    Description = models.TextField(default="not yet available")
+    Recommendations = models.TextField(default="not yet available")
+
+    def __str__(self):
+        return f'{self.Brand} {self.Name}'
+
+class Operating_System(models.Model):
+    Brand = models.CharField(max_length = 50, default = 'Microsoft')
+    Name = models.CharField(max_length = 50)
+    Price = models.DecimalField(max_digits=6, decimal_places=2)
+    Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/Operating_Systems')
+
+    def __str__(self):
+        return f'{self.Name}'
+
 class Configuration(models.Model):
-    # UserID = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     CPU = models.ForeignKey(CPU, on_delete=models.SET_NULL, null=True)
     GPU = models.ForeignKey(GPU, on_delete=models.SET_NULL, null=True)
     Motherboard = models.ForeignKey(Motherboard, on_delete=models.SET_NULL, null=True)
@@ -165,11 +224,14 @@ class Configuration(models.Model):
     Storage = models.ForeignKey(Storage, on_delete=models.SET_NULL, null=True)
     Case = models.ForeignKey(Case, on_delete=models.SET_NULL, null=True)
     CPU_Cooler = models.ForeignKey(CPU_Cooler, on_delete=models.SET_NULL, null=True)
-    # Total = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
+    Sound_Card = models.ForeignKey(Sound_Card, on_delete=models.SET_NULL, null=True, blank=True)
+    Optical_Drive = models.ForeignKey(Optical_Drive, on_delete=models.SET_NULL, null=True, blank=True)
+    Monitor = models.ForeignKey(Monitor, on_delete=models.SET_NULL, null=True, blank=True)
+    Operating_System = models.ForeignKey(Operating_System, on_delete=models.SET_NULL, null=True, blank=True)
     Date_Saved = models.DateTimeField(default=timezone.now)
     
     def __str__(self):
-        return f'Configuration saved at - {self.Date_Saved}'
+        return f'Configuration{self.id} saved at - {self.Date_Saved}'
 
 class Saved_build(models.Model):
     Name = models.CharField(max_length=50, null=True)
@@ -185,31 +247,3 @@ class Saved_build(models.Model):
             else:
                 return f'Build saved by admin - {self.Configuration.Date_Saved}'
 
-class Sound_card(models.Model):
-    Brand = models.CharField(max_length = 50)
-    Name = models.CharField(max_length = 50)
-    Connection = models.CharField(max_length = 20)
-    Internal = models.BooleanField()
-    Channel = models.CharField(max_length=10)
-    High_Res_audio = models.CharField(max_length = 20)
-    Price = models.DecimalField(max_digits=6, decimal_places=2)
-    Image = models.ImageField(default='default.jpg', upload_to='Part_Pics/CPU_Coolers')
-    Description = models.TextField(default="not yet available")
-    Recommendations = models.TextField(default="not yet available")
-
-    def __str__(self):
-        return f'{self.Brand} {self.Name}'
-
-class Optical_Drive(models.Model):
-    Brand = models.CharField(max_length = 50)
-    Name = models.CharField(max_length = 50)
-
-    def __str__(self):
-        return f'{self.Brand} {self.Name}'
-
-class Monitor(models.Model):
-    Brand = models.CharField(max_length = 50)
-    Name = models.CharField(max_length = 50)
-
-    def __str__(self):
-        return f'{self.Brand} {self.Name}'

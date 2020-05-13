@@ -17,14 +17,18 @@
             {% for key, parts in all_parts.items %}
                 <p class="part-type">{{ key }}:</p>
                 <div class="row" style="margin-bottom: 10px">
+                    <div class="column part-selector">
+                        <label for="{{ key }}_None">
+                            <input id='{{ key }}_None' name="{{ key }}" type="radio" value="{{ key }}-0">
+                            <i></i>
+                        </label>
+                        <h3 style="text-align: center;">NONE</h3>
+                    </div>
                 {% for part in parts %}
-                
                     <div class="column part-selector">
                         <label for="{{ part | get_class_name }}_{{ part.id }}">
-                            {% with part|get_class_name|add:"-"|add:part.id as val %}
                             <input id = "{{ part | get_class_name }}_{{ part.id }}" name="{{ part | get_class_name }}" type="radio" value="{{ part | get_value }}"
                                 {% if part|get_value in selections %} checked {% endif %}>
-                            {% endwith %}
                             <i></i>
                             <span style = "float: right; font-size: 14px">{{ part.Price }} €</span>
                         </label>
@@ -36,11 +40,9 @@
                             </div>
                         </a>
                     </div>
-                {% if forloop.counter|divisibleby:"8" and not forloop.last %}
-                </div><div class="row">
-                {% endif %}
-            {% endfor %}
+                {% endfor %}
                 </div>
+
                 <div class="pagination", style=" margin-bottom: 10px">
                     {% if parts.has_previous %}
                         <a href="?page{{ key }}=1"><< &nbsp; </a>

@@ -5,6 +5,11 @@ from django.core.serializers import serialize
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse
 from .forms import CheckoutForm, PaymentForm
+from django.core.mail import send_mail
+import os
+from main import myFunctions as mf
+from django.contrib.auth.decorators import login_required
+
 
 def CartView(request, confID):
     savedText = request.GET.get('saved')
@@ -18,9 +23,10 @@ def CartView(request, confID):
     del conf_ser[0]['fields']['Date_Saved']
     sum = 0
     for key, value in conf_ser[0]['fields'].items():
-        part = apps.get_model('main', key).objects.filter(id=value).first()
-        build.append(part)
-        sum = sum + float(part.Price)
+        if value:
+            part = apps.get_model('main', key).objects.filter(id=value).first()
+            build.append(part)
+            sum = sum + float(part.Price)
     sum = round(sum, 2)
     build.append(sum)
 
@@ -41,8 +47,9 @@ def Checkout(request, confID):
     del conf_ser[0]['fields']['Date_Saved']
     sum = 0
     for key, value in conf_ser[0]['fields'].items():
-        part = apps.get_model('main', key).objects.filter(id=value).first()
-        sum = sum + float(part.Price)
+        if value:
+            part = apps.get_model('main', key).objects.filter(id=value).first()
+            sum = sum + float(part.Price)
     sum = round(sum, 2)
 
     shipping_total = 0.00
@@ -66,8 +73,6 @@ def Checkout(request, confID):
         c_instance.final_total = sum + shipping_total
         c_instance.configuration = conf.first()
 
-
-        
         if user.is_authenticated:
             c_instance.user = user
             c_instance.save()
@@ -77,6 +82,15 @@ def Checkout(request, confID):
         else:
             c_instance.user = None
             c_instance.save()
+        
+        email_body = "Thank you for ordering a computer from my store. This is a conformation email of a successful order for a configuration with the parts: \n"
+        for key, value in conf_ser[0]['fields'].items():
+            if value:
+                part = apps.get_model('main', key).objects.filter(id=value).first()
+                email_body += "\t" + part.Brand + " " + part.Name + " - " + str(part.Price) + "€\n"
+        email_body += "\ttotal - " + str(sum) + "€\n"
+        email_body += "\nThank you for your support. \nPC Store"
+        send_mail("Order confirmation from PC Store", email_body, os.environ.get('EMAIL_USER'), [c_instance.email])
 
         return render(request, 'orders/checkout_complete.html')
 
@@ -101,3 +115,35 @@ def Checkout(request, confID):
         'final_total': sum + shipping_total,
     }
     return render(request, "orders/checkout.html", context)
+
+@login_required
+def OrderView (request):
+    get_orders = apps.get_model('orders','Order').objects.filter(user = request.user)
+    orders_ser = serialize("python", get_orders)
+    id_list = []
+    for item in orders_ser:
+        id_list.append(item['fields']['configuration'])
+
+    print(id_list)
+
+    builds, conf_ser = mf.get_saved_builds(request.user)
+    if builds:
+        i = 0
+        n = len(builds)
+        while i < n:
+            if builds[i]['confID'] not in id_list:
+                del builds[i]
+                n -= 1
+            else:
+                i += 1
+    
+    for i in range(0, len(orders_ser)):
+        for j in range(0, len(builds)):
+            if builds[j]['confID'] == orders_ser[i]['fields']['configuration']:
+                builds[j]['status'] = orders_ser[i]['fields']['status']
+
+    context = {
+        'title': 'Orders',
+        'builds': builds,
+    }
+    return render(request, 'orders/view_orders.html', context)

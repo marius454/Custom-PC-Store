@@ -6,7 +6,7 @@
     <h2>These are your saved builds:</h2>
     <div>
         {% for build in builds %}
-            <p class="part-type">Build {{ forloop.counter }}:</p>
+            <p class="part-type">Order {{ forloop.counter }} (config id = {{ build.confID }}), status - {{ build.status }}</p>
             <div class="row" style="margin-bottom: 10px">
             {% for part in build.parts %}
                 <div class="column part-selector" style="height: 175px">
@@ -23,21 +23,11 @@
         <div style="margin-top: 10px;">
             <p>Total price of this build is {{ build.total }} €</p>
         </div>
-        <div style="margin-bottom: 30px;">
-            <button class="btn btn-outline-info" type="submit" onclick="Cart({{ build.confID }})">Order PC</button>
-        </div>
         {% endfor %}
         </div>
     </div>
     {% else %}
-        <h2>You have no saved builds</h2>
+        <h2>You have no orders</h2>
     {% endif %}
 </div>
-
-<script>
-    function Cart(confID)
-    {
-        window.location.href = '/orders/cart/' + confID.toString() + '/?saved=True';
-    }
-</script>
 {% endblock content %}

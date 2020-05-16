@@ -3,7 +3,6 @@ from main.models import Configuration as conf
 from django.contrib.auth.models import User
 from django.utils import timezone
 from main.models import Configuration
-from creditcards.models import CardNumberField, CardExpiryField, SecurityCodeField
 from django_countries.fields import CountryField
 from django.core.validators import RegexValidator
 

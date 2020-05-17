@@ -1,6 +1,6 @@
 # Custom-PC-Store
 
-##Projekto paleidimo instrukcija:
+## Projekto paleidimo instrukcija:
 
 1.Jei neturima, reikia įsidiegti Python. Kodas buvo rašomas su Python 3.6 versija, o ši instrukcija išbandyta ir veikianti su python 3.8.3 versija.
   *	Parsisiųsti iš šio puslapio - https://www.python.org/downloads/
